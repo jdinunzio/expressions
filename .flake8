@@ -1,0 +1,29 @@
+[flake8]
+ignore =
+    # These are from black, so we ignore them.
+    E203,
+    E231,
+    # black and flake don't agree on 100 characters
+    E501,
+    W503
+exclude =
+    .git,
+    __pycache__,
+    # Ignore migrations as these are auto-generated
+    migrations,
+    releases,
+    venv
+per-file-ignores =
+max-line-length = 100
+no-accept-encodings = True
+
+
+# To ignore specific errors in one line, you can use:
+#
+#	# noqa: xxx
+#
+# where 'xxx' is the error code.
+#
+# To ignore all errors in one file, yo can also use:
+#
+#     flake8: noqa

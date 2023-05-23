@@ -1,0 +1,188 @@
+stages:
+  - Linting
+  - Build
+  - Tests
+  - Code Quality
+  - Acceptance Checks
+  - Push Charts
+
+variables:
+  PYTHON_IMAGE: ${PYTHON_IMAGE}
+  ECR_REGISTRY: 888888888888.xxx.ecr.eu-west-1.amazonaws.com
+  BUILD_REGISTRY: ${ECR_REGISTRY}/${CI_PROJECT_PATH}
+
+black:
+  stage: Linting
+  image: ${PYTHON_IMABE}
+  allow_failure: false
+  script:
+    - pip install black==20.8b1
+    - black --line-length 100 --check --diff src/expressions tests/
+  tags:
+    - eks
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'master'
+      when: on_success
+    - if: $CI_MERGE_REQUEST_ID
+      when: on_success
+    - changes:
+      - src/**/*
+      - tests/**/*
+      when: on_success
+
+flake8:
+  stage: Linting
+  image: ${PYTHON_IMAGE}
+  allow_failure: false
+  script:
+    - pip install flake8 flake8-coding flake8-executable flake8-logging-format flake8-assertive
+    - flake8 --config=.flake8 src/expressions tests
+  tags:
+    - eks
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'master'
+      when: on_success
+    - if: $CI_MERGE_REQUEST_ID
+      when: on_success
+    - changes:
+      - src/**/*
+      - tests/**/*
+      when: on_success
+
+lint:
+  stage: Linting
+  image: ${PYTHON_IMAGE}
+  allow_failure: false
+  script:
+    - pip install pylint
+    - pylint --rcfile=.pylintrc src/expressions tests
+  tags:
+    - eks
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'master'
+      when: on_success
+    - if: $CI_MERGE_REQUEST_ID
+      when: on_success
+    - changes:
+      - src/**/*
+      - tests/**/*
+      when: on_success
+
+safety:
+  stage: Linting
+  image: ${PYTHON_IMAGE}
+  allow_failure: false
+  script:
+    - pip install safety
+    - safety check
+  tags:
+    - eks
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'master'
+      when: on_success
+    - if: $CI_MERGE_REQUEST_ID
+      when: on_success
+    - changes:
+      - src/**/*
+      - tests/**/*
+      when: on_success
+
+typecheck:
+  stage: Linting
+  image: ${PYTHON_IMAGE}
+  allow_failure: false
+  script:
+    - pip install mypy
+    - mypy --config-file .mypy.ini src tests/unit/
+  tags:
+    - eks
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'master'
+      when: on_success
+    - if: $CI_MERGE_REQUEST_ID
+      when: on_success
+    - changes:
+      - src/**/*
+      - tests/**/*
+      when: on_success
+
+build:
+  stage: Build
+  allow_failure: false
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  variables:
+    KUBERNETES_SERVICE_ACCOUNT_OVERWRITE: "gitlab-runner-ecr"
+  script:
+    - echo "{\"credHelpers\":{\"xxxx.eu-west-1.amazonaws.com\":\"ecr-login\"}}" > /kaniko/.docker/config.json
+    - /kaniko/executor
+        --cache=true
+        --destination ${BUILD_REGISTRY}:${CI_COMMIT_SHA}
+        --context ${CI_PROJECT_DIR}
+        --dockerfile Dockerfile
+  tags:
+    - eks
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'master'
+      when: never
+    - if: $CI_MERGE_REQUEST_ID
+      when: on_success
+    - changes:
+      - src/**/*
+      - tests/unit/**/*
+      - tests/integration/**/*
+      when: on_success
+
+build-master:
+  stage: Build
+  allow_failure: false
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  variables:
+    KUBERNETES_SERVICE_ACCOUNT_OVERWRITE: "gitlab-runner-ecr"
+  script:
+    - VERSION="v$(cat pyproject.toml | grep '^version' | awk '{gsub(/"/, "", $3); print $3}')"
+    - echo "{\"credHelpers\":{\"xxxx.dkr.ecr.eu-west-1.amazonaws.com\":\"ecr-login\"}}" > /kaniko/.docker/config.json
+    - /kaniko/executor
+        --cache=true
+        --destination ${BUILD_REGISTRY}:${CI_COMMIT_SHA}
+        --destination ${BUILD_REGISTRY}:${VERSION}
+        --destination ${BUILD_REGISTRY}:latest
+        --context ${CI_PROJECT_DIR}
+        --dockerfile Dockerfile
+  tags:
+    - eks
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'master'
+      when: on_success
+
+tests:
+  stage: Tests
+  image:
+    name: ${BUILD_REGISTRY}:${CI_COMMIT_SHA}
+    entrypoint: [""]
+  script:
+    - export PYTHONPATH=./src
+    - pip install hypothesis typing_extensions pact-python sh faker pytest pytest-asyncio pytest-trio
+    - make coverage
+  tags:
+    - eks
+  artifacts:
+    paths:
+      - ./reports/coverage.xml
+  allow_failure: false
+  rules:
+    - if: $CI_COMMIT_BRANCH == 'master'
+      when: on_success
+    - if: $CI_COMMIT_BRANCH == /^release\/.*$/
+      when: on_success
+    - if: $CI_MERGE_REQUEST_ID
+      when: on_success
+    - changes:
+      - src/**/*
+      - tests/unit/**/*
+      - tests/integration/**/*
+      when: on_success
+

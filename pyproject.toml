@@ -1,0 +1,133 @@
+[tool.poetry]
+name = "expressions"
+version = "0.1.0"
+description = "Expression Representation and Evaluation Library."
+authors = ["Jose Di Nunzio <jose.dinuncio@gmail.com>"]
+
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pip = "^22.2.2"
+starlette = "^0.27.0"  # for its config and .env features
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^22.12.0"
+coverage = {extras = ["toml"], version = "^6.5.0"}
+flake8 = "^4.0.1"
+flake8-assertive = "^1.3.0"
+flake8-junit-report = "^2.1"
+green = "^3.4.2"
+isort = "^5.12.0"
+mypy = "^0.942"
+pydocstyle = "^6.1.1"
+pylint = "^2.15.0"
+ruff = "^0.0.262"
+safety = "^1.10.3"
+unittest-xml-reporting = "^2.5.2"
+
+[tool.poetry.group.test.dependencies]
+green = "^3.4.3"
+
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
+
+[tool.pylint.MASTER]
+# NOTE: To disable pylint in one specific line of a file, put a comment like this one:
+#   # pylint: disable=invalid-name
+#
+# To disable all warning in a file use:
+#   # pylint: skip-file
+#
+# You can generate see all possible config options with:
+#   $ pylint --generate-rcfile
+disable = [
+    "missing-module-docstring",
+    "missing-function-docstring",
+	"too-few-public-methods",
+]
+# ignored-modules=logging,foo,bar,baz
+
+
+[tool.black]
+line-length = 100
+
+
+[tool.isort]
+profile = "black"
+
+
+[tool.coverage.run]
+source = [
+    "./src/",
+]
+omit = [
+    # omit anything in the tests directory
+    "./tests/*",
+]
+
+
+[tool.coverage.report]
+exclude_lines = [
+    # Have to re-enable the standard pragma
+    "pragma: no cover",
+
+    # Don't complain if tests don't hit abstract methods:
+    "raise NotImplementedError",
+]
+
+
+[tool.mypy]
+# Note: you can silence errors in specific lines adding a comment like this one:
+#
+#    # type: ignore
+#
+# or in whole files adding this comment at the top:
+#
+#    # mypy: ignore-errors
+python_version = 3.11
+# warn_return_any = true
+warn_unused_configs = true
+exclude = ".venv"
+
+# [tool.mypy-mycode.foo.*]
+# disallow_untyped_defs = true
+#
+# [tool.mypy-mycode.bar]
+# warn_return_any = false
+#
+# [tool.mypy-somelibrary]
+# ignore_missing_imports = true
+
+
+[tool.pydocstyle]
+# From http://www.pydocstyle.org/en/stable/usage.html#in-file-configuration
+#
+# pydocstyle supports inline commenting to skip specific checks on specific functions
+# or methods. The supported comments that can be added are:
+#
+#    "# noqa" skips all checks.
+#    "# noqa: D102,D203" can be used to skip specific checks. Note that this is compatible
+#             with skips from flake8, e.g. # noqa: D102,E501,D203.
+#
+# For example, this will skip the check for a period at the end of a function docstring:
+#
+#    def bad_function():  # noqa: D400
+#        """Omit a period in the docstring as an exception"""
+#        pass
+
+ignore = [
+	"D100", "D105", "D106", "D107",
+	"D203", "D211", "D213",
+	"D400", "D405", "D406", "D407", "D413",
+]
+match = "(?!test_)(?!__init__).*\\.py"
+match-dir = "^(?!(tests|migrations)).*[pydocstyle]"
+#inherit = false
+
+
+[tool.ruff]
+line-length=100
