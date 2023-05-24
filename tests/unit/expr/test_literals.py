@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from expressions.exceptions import ExpressionValidationError
-from expressions.expr.literalboolean import Boolean
+from expressions.expr.literals import Boolean
 
 
 class TestBoolean(TestCase):
