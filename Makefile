@@ -47,7 +47,7 @@ black-check:               ## Code checking with black
 	@poetry run black --check --diff src tests
 
 black-fix:                 ## Code formatting with black
-	@poetry run isort src test
+	@poetry run isort src tests
 	@poetry run black src tests
 
 dev-check:                 ## Run common development checks
