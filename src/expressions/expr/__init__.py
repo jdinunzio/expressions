@@ -1,4 +1,14 @@
 # flake8: noqa=F401
+from .comparison import (
+    Comparable,
+    Comparison,
+    Equal,
+    GreaterThan,
+    GreaterThanOrEqual,
+    LessThan,
+    LessThanOrEqual,
+    NotEqual,
+)
 from .expr_base import Expression, ExpressionArity
 from .expr_types import (
     BooleanExpression,
