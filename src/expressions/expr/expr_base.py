@@ -56,7 +56,7 @@ class Expression(abc.ABC, Generic[T]):
         return cls.arity == ExpressionArity.NULLARY
 
     @abc.abstractmethod
-    def sub_expressions(self) -> tuple[Expression]:
+    def sub_expressions(self) -> tuple[Expression, ...]:
         """Return list of direct sub-expressions of this expression.
 
         Returns:
@@ -81,9 +81,9 @@ class Expression(abc.ABC, Generic[T]):
 class HomogeneousListMixin(Generic[T]):
     """Mixin for expressions that contains a list of sub-expressions of the same type."""
 
-    arity: ExpressionArity = ExpressionArity.NULLARY
+    arity: ExpressionArity = ExpressionArity.N_ARY
     _items_type: type[Expression]
-    _sub_expressions: tuple[Expression]
+    _sub_expressions: tuple[Expression, ...]
 
     def __init__(self, *sub_expressions: T) -> None:
         """Constructor for expression with homogeneous list of sub-expressions."""
@@ -99,6 +99,6 @@ class HomogeneousListMixin(Generic[T]):
         if errors:
             raise ExpressionValidationError("expression validation error", errors)
 
-    def sub_expressions(self) -> tuple[Expression]:
+    def sub_expressions(self) -> tuple[Expression, ...]:
         """Return list of direct sub-expressions of this expression."""
         return self._sub_expressions
