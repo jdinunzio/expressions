@@ -9,6 +9,7 @@ authors = ["Jose Di Nunzio <jose.dinuncio@gmail.com>"]
 python = "^3.11"
 pip = "^22.2.2"
 starlette = "^0.27.0"  # for its config and .env features
+pytz = "^2023.3"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -22,8 +23,10 @@ isort = "^5.12.0"
 mypy = "^0.942"
 pydocstyle = "^6.1.1"
 pylint = "^2.15.0"
+pytz = "^2023.3"
 ruff = "^0.0.262"
 safety = "^1.10.3"
+types-pytz = "^2023.3.0.0"
 unittest-xml-reporting = "^2.5.2"
 
 [tool.poetry.group.test.dependencies]

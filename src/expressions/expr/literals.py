@@ -1,9 +1,17 @@
+from datetime import datetime, timedelta
+from decimal import Decimal
 from typing import Any, Generic, cast
 
 from expressions.context import Context
 from expressions.exceptions import ExpressionValidationError
 from expressions.expr.expr_base import Expression, ExpressionArity, T
-from expressions.expr.expr_types import BooleanExpression
+from expressions.expr.expr_types import (
+    BooleanExpression,
+    DatetimeExpression,
+    NumericExpression,
+    StringExpression,
+    TimedeltaExpression,
+)
 
 
 class LiteralMixin(Generic[T]):
@@ -35,5 +43,40 @@ class LiteralMixin(Generic[T]):
         return self.value
 
 
+class Null(LiteralMixin[None], Expression[None]):
+    """Null literal expression."""
+
+    return_type = type(None)
+
+    def __init__(self) -> None:
+        """Literal constructor."""
+        super().__init__(None)
+
+
 class Boolean(LiteralMixin[bool], BooleanExpression):
     """Boolean literal expression."""
+
+
+class Number(LiteralMixin[Decimal], NumericExpression):
+    """Numeric literal expression."""
+
+    def __init__(self, value: bool | int | float | Decimal) -> None:
+        """Literal constructor."""
+        if not isinstance(value, int | float | Decimal):
+            raise ExpressionValidationError(
+                "expression validation error",
+                [{"value": "literal value is not int, float or decimal"}],
+            )
+        super().__init__(Decimal(value))
+
+
+class String(LiteralMixin[str], StringExpression):
+    """String literal expression."""
+
+
+class Datetime(LiteralMixin[datetime], DatetimeExpression):
+    """Datetime literal expression."""
+
+
+class Timedelta(LiteralMixin[timedelta], TimedeltaExpression):
+    """Timedelta literal expression."""
