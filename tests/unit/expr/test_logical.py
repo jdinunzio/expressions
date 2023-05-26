@@ -16,7 +16,7 @@ class BaseLogicalTest:  # pylint: disable=no-member
         self.assertEqual(self.instance.return_type, bool)
 
     def test_evaluates_ok(self):
-        """Logical operation evaluate to rigth result."""
+        """Logical operation evaluate to right result."""
         for vals, result in self.evaluation_cases:
             with self.subTest(vals):
                 expr = self.expr_class(*vals)

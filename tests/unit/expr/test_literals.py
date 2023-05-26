@@ -59,7 +59,7 @@ class BaseLiteralMixin:  # pylint: disable=no-member
                     self.literal_type(val)
 
 
-class TestNull(TestCase):
+class TestNullLiteral(TestCase):
     """Test case for null literals."""
 
     literal_type = Null
@@ -81,14 +81,14 @@ class TestNull(TestCase):
         self.assertIsNone(expr.evaluate({}))
 
 
-class TestBoolean(TestCase, BaseLiteralMixin):
+class TestBooleanLiteral(TestCase, BaseLiteralMixin):
     """Test case for boolean literals."""
 
     literal_type = Boolean
     valid_literals = (False, True)
 
 
-class TestNumber(TestCase, BaseLiteralMixin):
+class TestNumberLiteral(TestCase, BaseLiteralMixin):
     """Test case for number literals."""
 
     literal_type = Number
@@ -114,21 +114,21 @@ class TestNumber(TestCase, BaseLiteralMixin):
                 self.assertEqual(expr.evaluate({}), Decimal(val))
 
 
-class TestString(TestCase, BaseLiteralMixin):
+class TestStringLiteral(TestCase, BaseLiteralMixin):
     """Test case for string literals."""
 
     literal_type = String
     valid_literals = ("hello",)
 
 
-class TestDatetime(TestCase, BaseLiteralMixin):
+class TestDatetimeLiteral(TestCase, BaseLiteralMixin):
     """Test case for datetime literals."""
 
     literal_type = Datetime
     valid_literals = (datetime.now(tz=pytz.utc),)
 
 
-class TestTimedelta(TestCase, BaseLiteralMixin):
+class TestTimedeltaLiteral(TestCase, BaseLiteralMixin):
     """Test case for time delta literals."""
 
     literal_type = Timedelta
