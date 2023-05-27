@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from typing import Any, Generic, cast
 
 from expressions.context import Context
@@ -60,14 +60,21 @@ class Boolean(LiteralMixin[bool], BooleanExpression):
 class Number(LiteralMixin[Decimal], NumericExpression):
     """Numeric literal expression."""
 
-    def __init__(self, value: bool | int | float | Decimal) -> None:
+    def __init__(self, value: bool | int | float | str | Decimal) -> None:
         """Literal constructor."""
-        if not isinstance(value, int | float | Decimal):
+        if not isinstance(value, int | float | str | Decimal):
             raise ExpressionValidationError(
                 "expression validation error",
-                [{"value": "literal value is not int, float or decimal"}],
+                [{"value": "literal value is not int, float, string or decimal"}],
             )
-        super().__init__(Decimal(value))
+        try:
+            dec_value = Decimal(value)
+        except InvalidOperation as exc:
+            raise ExpressionValidationError(
+                "expression validation error",
+                [{"value": "given string cannot be converted into number"}],
+            ) from exc
+        super().__init__(Decimal(dec_value))
 
 
 class String(LiteralMixin[str], StringExpression):

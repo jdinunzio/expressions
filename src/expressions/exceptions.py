@@ -26,3 +26,10 @@ class ExpressionValidationError(ExpressionError):
         """
         super().__init__(message)
         self.errors = errors
+
+
+class ExpressionEvaluationError(ExpressionError):
+    """Expression Evaluation Error.
+
+    Exception raised when there's an error evaluating the expression.
+    """
