@@ -20,3 +20,4 @@ from .expr_types import (
 )
 from .literals import Boolean, Datetime, Null, Number, String, Timedelta
 from .logical import And, Not, Or
+from .variable import Variable

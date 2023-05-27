@@ -33,3 +33,23 @@ class ExpressionEvaluationError(ExpressionError):
 
     Exception raised when there's an error evaluating the expression.
     """
+
+
+class VariableNotFoundException(ExpressionEvaluationError):
+    """Variable not found during evaluation."""
+
+
+class VariableTypeException(ExpressionEvaluationError):
+    """Variable has wrong type."""
+
+
+class ContextException(ExpressionError):
+    """Base exception class for context related errors."""
+
+
+class ContextVariableNotFoundException(ContextException):
+    """Exception raised when trying to access a variable not in context."""
+
+
+class ContextPopException(ContextException):
+    """Attempt to pop mapping from context with no mappings."""
