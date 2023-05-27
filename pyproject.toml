@@ -51,6 +51,7 @@ disable = [
     "missing-module-docstring",
     "missing-function-docstring",
 	"too-few-public-methods",
+	"fixme",
 ]
 # ignored-modules=logging,foo,bar,baz
 
