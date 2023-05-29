@@ -50,6 +50,8 @@ class Expression(abc.ABC, Generic[T]):
     def is_terminal(cls) -> bool:
         """Return true if this expression is terminal.
 
+        An expression is terminal if it doesn't contain any sub-expression.
+
         Returns:
             True if expressions of this type are terminal.
         """
