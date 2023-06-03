@@ -15,7 +15,11 @@ from expressions.expr.expr_types import (
 
 
 class LiteralMixin(Generic[T]):
-    """Mixin for all literal expressions."""
+    """Mixin for all literal expressions.
+
+    Literal expressions represent literal values and evaluate to them. They have nullary arity,
+    since don't contain any sub-expression, making them terminal expressions.
+    """
 
     return_type: Any
     is_literal: bool = True
@@ -42,13 +46,26 @@ class LiteralMixin(Generic[T]):
         """Evaluate expression in context."""
         return self.value
 
+    def __eq__(self, other: object) -> bool:
+        """Return true if expressions are equal."""
+        # they must be of the same type
+        if self.__class__ != other.__class__:
+            return False
+
+        # and must have the same value
+        return self.value == cast(LiteralMixin, other).value
+
+    def __repr__(self) -> str:
+        """Return string representation of this instance."""
+        return f"{self.__class__.__name__}({self.value!s})"
+
 
 class Null(LiteralMixin[None], Expression[None]):
     """Null literal expression."""
 
     return_type = type(None)
 
-    def __init__(self) -> None:
+    def __init__(self, _=None) -> None:
         """Literal constructor."""
         super().__init__(None)
 
@@ -68,7 +85,9 @@ class Number(LiteralMixin[Decimal], NumericExpression):
                 [{"value": "literal value is not int, float, string or decimal"}],
             )
         try:
-            dec_value = Decimal(value)
+            # convert number to string before decimalise it to get a "better" (more rounded)
+            # representation
+            dec_value = Decimal(str(value))
         except InvalidOperation as exc:
             raise ExpressionValidationError(
                 "expression validation error",
@@ -83,6 +102,10 @@ class String(LiteralMixin[str], StringExpression):
 
 class Datetime(LiteralMixin[datetime], DatetimeExpression):
     """Datetime literal expression."""
+
+    def __repr__(self) -> str:
+        """Return string representation of this instance."""
+        return f"{self.__class__.__name__}({self.value.isoformat()})"
 
 
 class Timedelta(LiteralMixin[timedelta], TimedeltaExpression):

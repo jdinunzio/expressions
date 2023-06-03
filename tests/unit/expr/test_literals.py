@@ -111,7 +111,7 @@ class TestNumberLiteral(TestCase, BaseLiteralMixin):
         for val in self.valid_literals:
             with self.subTest(val):
                 expr = self.literal_type(val)
-                self.assertEqual(expr.evaluate({}), Decimal(val))
+                self.assertEqual(expr.evaluate({}), Decimal(str(val)))
 
 
 class TestStringLiteral(TestCase, BaseLiteralMixin):

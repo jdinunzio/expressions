@@ -53,3 +53,7 @@ class ContextVariableNotFoundException(ContextException):
 
 class ContextPopException(ContextException):
     """Attempt to pop mapping from context with no mappings."""
+
+
+class ParseException(ExpressionError):
+    """Parse Exception."""

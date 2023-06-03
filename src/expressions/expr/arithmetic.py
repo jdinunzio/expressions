@@ -27,7 +27,7 @@ class Add(Arithmetic):
 class Sub(Arithmetic):
     """Subtraction expression."""
 
-    arity = ExpressionArity.AT_LEAST_TWO
+    arity = ExpressionArity.BINARY
 
     def evaluate(self, context: Context) -> Decimal:
         """Evaluate subtraction in context."""
