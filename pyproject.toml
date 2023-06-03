@@ -10,6 +10,8 @@ python = "^3.11"
 pip = "^22.2.2"
 starlette = "^0.27.0"  # for its config and .env features
 pytz = "^2023.3"
+zope-interface = "^6.0"
+zope-component = "^6.0"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -28,6 +30,8 @@ ruff = "^0.0.262"
 safety = "^1.10.3"
 types-pytz = "^2023.3.0.0"
 unittest-xml-reporting = "^2.5.2"
+zope-interface = "^6.0"
+zope-component = "^6.0"
 
 [tool.poetry.group.test.dependencies]
 green = "^3.4.3"
