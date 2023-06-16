@@ -3,33 +3,33 @@ import expressions.serialiser.dict_serialiser_init  # noqa: F401  # pylint: disa
 from expressions.expr.expr_base import Expression
 from expressions.parser.parser import Parser
 from expressions.serialiser.dict_serialiser import (
-    LiteralPrimitive,
+    PrimitiveType,
     deserialiser_from_instance,
     serialiser_from_instance,
 )
 
 
-class DictParser(Parser[LiteralPrimitive]):
+class PrimitiveParser(Parser[PrimitiveType]):
     """Parser from and to python literal primitive data types."""
 
-    def serialise(self, expr: Expression) -> LiteralPrimitive:
-        """Serialise an expression into python literal data types.
+    def serialise(self, expr: Expression) -> PrimitiveType:
+        """Serialise an expression into python primitive types.
 
         Args:
             expr: Expression to serialise.
 
         Returns:
-            The expression serialised.
+            The expression serialised into primitive python objects.
         """
         serialiser = serialiser_from_instance(expr)
         data = serialiser.serialise(expr)  # type: ignore
         return data
 
-    def parse(self, data: LiteralPrimitive) -> Expression:
-        """Parse python literal data into an expression.
+    def parse(self, data: PrimitiveType) -> Expression:
+        """Parse python primitive data into an expression.
 
         Args:
-            data: Expression representation.
+            data: Expression representation in primitive python objects.
 
         Returns:
             Parsed expression.
