@@ -27,14 +27,14 @@ from expressions import (
     Timedelta,
     Variable,
 )
-from expressions.parser import DictParser, JsonParser, Parser
-from expressions.serialiser.dict_serialiser import LiteralPrimitive
+from expressions.parser import JsonParser, Parser, PrimitiveParser
+from expressions.serialiser.dict_serialiser import PrimitiveType
 
 
 class TestPaserMixin:
     """Test case for Expression parser."""
 
-    expr_dct: list[tuple[Expression, LiteralPrimitive]] = [
+    expr_dct: list[tuple[Expression, PrimitiveType]] = [
         # (expression, dict)
     ]
     parser: Parser
@@ -82,10 +82,10 @@ class TestPaserMixin:
                 self.assertEqual(self.parser.parse(dct), expr)
 
 
-class TestDictPaser(TestPaserMixin, TestCase):
-    """Test case for Dict Parser."""
+class TestPrimitivePaser(TestPaserMixin, TestCase):
+    """Test case for Primitive Parser."""
 
-    expr_dct: list[tuple[Expression, LiteralPrimitive]] = [
+    expr_dct: list[tuple[Expression, PrimitiveType]] = [
         # (expression, dict)
         # literals
         (Null(), None),
@@ -122,7 +122,7 @@ class TestDictPaser(TestPaserMixin, TestCase):
         (Variable("x", int), {"var": {"name": "x", "return_type": int}}),
         (Variable("x", int, 3), {"var": {"name": "x", "return_type": int, "default": 3}}),
     ]
-    parser: Parser = DictParser()
+    parser: Parser = PrimitiveParser()
 
 
 def obj_to_json(val: datetime | timedelta | Decimal | float | int | type) -> str:
@@ -142,7 +142,7 @@ def obj_to_json(val: datetime | timedelta | Decimal | float | int | type) -> str
 class TestJsonPaser(TestPaserMixin, TestCase):
     """Test case for Dict Parser."""
 
-    expr_dct: list[tuple[Expression, LiteralPrimitive]] = [
+    expr_dct: list[tuple[Expression, PrimitiveType]] = [
         # # (expression, dict)
         # literals
         (Null(), "null"),

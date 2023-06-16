@@ -30,8 +30,8 @@ from expressions.expr.literals import (
 from expressions.serialiser.dict_serialiser import (
     HomogeneousListDictDeserialiser,
     HomogeneousListDictSerialiser,
-    IDictDeserialiser,
-    IDictSerialiser,
+    IPrimitiveDeserialiser,
+    IPrimitiveSerialiser,
     LiteralDictDeserialiser,
     LiteralDictSerialiser,
     MappeableDeserialiser,
@@ -45,11 +45,11 @@ def _register_literal(klass: type[LiteralMixin], primitive_type_names: str | lis
     Literal serialisers are registered with the name of the expression.
     Literal deserialisers are registered with the name of the primitive type ("bool", "str", etc.).
     """
-    provideUtility(LiteralDictSerialiser, IDictSerialiser, klass.__name__)
+    provideUtility(LiteralDictSerialiser, IPrimitiveSerialiser, klass.__name__)
     if not isinstance(primitive_type_names, list):
         primitive_type_names = [primitive_type_names]
     for name in primitive_type_names:
-        provideUtility(LiteralDictDeserialiser(klass), IDictDeserialiser, name)
+        provideUtility(LiteralDictDeserialiser(klass), IPrimitiveDeserialiser, name)
 
 
 def _register_hom_list(klass: type[HomogeneousListMixin], name: str) -> None:
@@ -58,8 +58,8 @@ def _register_hom_list(klass: type[HomogeneousListMixin], name: str) -> None:
     Serialisers are registered with the name of the expression.
     Deserialisers are registered with the given name.
     """
-    provideUtility(HomogeneousListDictSerialiser(name), IDictSerialiser, klass.__name__)
-    provideUtility(HomogeneousListDictDeserialiser(klass), IDictDeserialiser, name)
+    provideUtility(HomogeneousListDictSerialiser(name), IPrimitiveSerialiser, klass.__name__)
+    provideUtility(HomogeneousListDictDeserialiser(klass), IPrimitiveDeserialiser, name)
 
 
 def _register_mappeable(klass: type[MappeableMixin], name: str) -> None:
@@ -68,8 +68,8 @@ def _register_mappeable(klass: type[MappeableMixin], name: str) -> None:
     Serialisers are registered with the name of the expression.
     Deserialisers are registered with the given name.
     """
-    provideUtility(MappeableSerialiser(name), IDictSerialiser, klass.__name__)
-    provideUtility(MappeableDeserialiser(klass), IDictDeserialiser, name)
+    provideUtility(MappeableSerialiser(name), IPrimitiveSerialiser, klass.__name__)
+    provideUtility(MappeableDeserialiser(klass), IPrimitiveDeserialiser, name)
 
 
 def register_dict_serialisers_and_deserialisers() -> None:

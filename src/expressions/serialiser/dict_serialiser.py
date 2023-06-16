@@ -10,24 +10,24 @@ from expressions.exceptions import ParseException
 from expressions.expr.expr_base import HomogeneousListMixin, MappeableMixin
 from expressions.expr.literals import LiteralMixin
 
-LiteralPrimitive = None | bool | int | float | Decimal | str | datetime | timedelta | dict
+PrimitiveType = None | bool | int | float | Decimal | str | datetime | timedelta | dict
 
 
-class IDictSerialiser(zope.interface.Interface):  # pylint: disable=inherit-non-class
-    """Expression-Dictionary Serialiser Interface."""
+class IPrimitiveSerialiser(zope.interface.Interface):  # pylint: disable=inherit-non-class
+    """Interface for Serialiser from Expressions to Python Primitive types."""
 
-    def serialise(expr: Expression) -> LiteralPrimitive:  # pylint: disable=no-self-argument
-        """Serialise expression."""
-
-
-class IDictDeserialiser(zope.interface.Interface):  # pylint: disable=inherit-non-class
-    """Expression-Dictionary Deserialiser Interface."""
-
-    def deserialise(data: LiteralPrimitive) -> Expression:  # pylint: disable=no-self-argument
-        """Deserialise expression."""
+    def serialise(expr: Expression) -> PrimitiveType:  # pylint: disable=no-self-argument
+        """Serialise expression into primitive python types."""
 
 
-def serialiser_from_instance(expr: Expression) -> IDictSerialiser:
+class IPrimitiveDeserialiser(zope.interface.Interface):  # pylint: disable=inherit-non-class
+    """Interfcace fod Deserialiser from Python Primitive types to Expressions."""
+
+    def deserialise(data: PrimitiveType) -> Expression:  # pylint: disable=no-self-argument
+        """Deserialise expression from primitive python types."""
+
+
+def serialiser_from_instance(expr: Expression) -> IPrimitiveSerialiser:
     """Return the dict serialiser for the given expression.
 
     The appropriate serialiser is a named zope adapter looked up from Zope Component Architecture
@@ -39,11 +39,11 @@ def serialiser_from_instance(expr: Expression) -> IDictSerialiser:
     Returns:
         Expression Serialiser.
     """
-    serialiser = getUtility(IDictSerialiser, expr.__class__.__name__)
+    serialiser = getUtility(IPrimitiveSerialiser, expr.__class__.__name__)
     return serialiser
 
 
-def deserialiser_from_instance(data: LiteralPrimitive) -> IDictDeserialiser:
+def deserialiser_from_instance(data: PrimitiveType) -> IPrimitiveDeserialiser:
     """Return the dict deserialiser for the given primitive.
 
     The appropriate deserialiser is a named zope adapter looked up from Zope Component Architecture,
@@ -68,11 +68,11 @@ def deserialiser_from_instance(data: LiteralPrimitive) -> IDictDeserialiser:
     else:
         # other deserialisers are chosen by their class name
         deserialiser_name = data.__class__.__name__
-    deserialiser = getUtility(IDictDeserialiser, deserialiser_name)
+    deserialiser = getUtility(IPrimitiveDeserialiser, deserialiser_name)
     return deserialiser
 
 
-@zope.interface.implementer(IDictSerialiser)
+@zope.interface.implementer(IPrimitiveSerialiser)
 class LiteralDictSerialiser:
     """Serialiser for literal expressions.
 
@@ -80,12 +80,12 @@ class LiteralDictSerialiser:
     """
 
     @staticmethod
-    def serialise(expr: Expression) -> LiteralPrimitive:
+    def serialise(expr: Expression) -> PrimitiveType:
         """Serialise literal expression."""
         return cast(LiteralMixin, expr).value
 
 
-@zope.interface.implementer(IDictDeserialiser)
+@zope.interface.implementer(IPrimitiveDeserialiser)
 class LiteralDictDeserialiser:
     """Deserialiser for literal expressions.
 
@@ -97,12 +97,12 @@ class LiteralDictDeserialiser:
         """Literal dictionary constructor."""
         self.expr_class = expr_class
 
-    def deserialise(self, data: LiteralPrimitive) -> Expression:
+    def deserialise(self, data: PrimitiveType) -> Expression:
         """Deserialise literal expression."""
         return cast(Expression, self.expr_class(data))
 
 
-@zope.interface.implementer(IDictSerialiser)
+@zope.interface.implementer(IPrimitiveSerialiser)
 class HomogeneousListDictSerialiser:
     """Serialiser for expressions with homogeneous lists.
 
@@ -115,7 +115,7 @@ class HomogeneousListDictSerialiser:
         """Serialiser for expressions with homogeneous list constructor."""
         self.expr_name = expr_name
 
-    def serialise(self, expr: Expression) -> LiteralPrimitive:
+    def serialise(self, expr: Expression) -> PrimitiveType:
         """Serialise expression with homogeneous lists."""
         serialised_sub_expressions = []
         for sub_expression in expr.sub_expressions():
@@ -125,7 +125,7 @@ class HomogeneousListDictSerialiser:
         return {self.expr_name: serialised_sub_expressions}
 
 
-@zope.interface.implementer(IDictDeserialiser)
+@zope.interface.implementer(IPrimitiveDeserialiser)
 class HomogeneousListDictDeserialiser:
     """Deserialiser for expressions with homogeneous lists.
 
@@ -140,7 +140,7 @@ class HomogeneousListDictDeserialiser:
         """Deserialiser for expressions with homogeneous list constructor."""
         self.expr_class = expr_class
 
-    def deserialise(self, data: LiteralPrimitive) -> Expression:
+    def deserialise(self, data: PrimitiveType) -> Expression:
         """Deserialise expression with homogeneous lists."""
         # get the list from the first and only key in the data
         assert isinstance(data, dict)
@@ -154,7 +154,7 @@ class HomogeneousListDictDeserialiser:
         return cast(Expression, self.expr_class(*sub_expressions))
 
 
-@zope.interface.implementer(IDictSerialiser)
+@zope.interface.implementer(IPrimitiveSerialiser)
 class MappeableSerialiser:
     """Serialiser for mappeable expressions.
 
@@ -167,7 +167,7 @@ class MappeableSerialiser:
         """Serialiser for mappeable expressions constructor."""
         self.expr_name = expr_name
 
-    def serialise(self, expr: Expression) -> LiteralPrimitive:
+    def serialise(self, expr: Expression) -> PrimitiveType:
         """Serialise mappeable expression with homogeneous lists."""
         vals_map = cast(MappeableMixin, expr).to_dict()
         for key in cast(MappeableMixin, expr).sub_expression_names:
@@ -178,7 +178,7 @@ class MappeableSerialiser:
         return {self.expr_name: vals_map}
 
 
-@zope.interface.implementer(IDictDeserialiser)
+@zope.interface.implementer(IPrimitiveDeserialiser)
 class MappeableDeserialiser:
     """Deserialiser for mappeable expressions.
 
@@ -193,7 +193,7 @@ class MappeableDeserialiser:
         """Deserialiser for mapped expressions constructor."""
         self.expr_class = expr_class
 
-    def deserialise(self, data: LiteralPrimitive) -> Expression:
+    def deserialise(self, data: PrimitiveType) -> Expression:
         """Deserialise mapped expression."""
         # get the list from the first and only key in the data
         assert isinstance(data, dict)

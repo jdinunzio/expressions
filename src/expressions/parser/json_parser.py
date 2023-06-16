@@ -4,8 +4,8 @@ from decimal import Decimal
 from typing import Any
 
 from expressions import Expression
-from expressions.parser.dict_parser import DictParser
 from expressions.parser.parser import Parser
+from expressions.parser.primitive_parser import PrimitiveParser
 
 JsonPrimitive = None | bool | int | float | Decimal | str | dict
 
@@ -25,7 +25,7 @@ class JsonParser(Parser[str]):
 
     def __init__(self):
         """Constructor."""
-        self._dict_parser = DictParser()
+        self._dict_parser = PrimitiveParser()
 
     def serialise(self, expr: Expression) -> str:
         """Serialise an expression into a JSON string.
