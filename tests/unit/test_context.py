@@ -1,7 +1,7 @@
 import unittest
 
 from expressions import Context
-from expressions.exceptions import ContextPopException, ContextVariableNotFoundException
+from expressions.exceptions import ContextPopError, ContextVariableNotFoundError
 
 
 class ContextTests(unittest.TestCase):
@@ -26,7 +26,7 @@ class ContextTests(unittest.TestCase):
         Then a ContextVariableNotFound exception should be raised.
         """
         context = Context()
-        with self.assertRaises(ContextVariableNotFoundException):
+        with self.assertRaises(ContextVariableNotFoundError):
             context.get("x")
 
     def test_get_variable_not_in_context_with_default(self):
@@ -99,5 +99,5 @@ class ContextTests(unittest.TestCase):
         """
         context = Context()
         context.pop_subcontext()
-        with self.assertRaises(ContextPopException):
+        with self.assertRaises(ContextPopError):
             context.pop_subcontext()

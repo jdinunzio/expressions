@@ -140,3 +140,38 @@ match-dir = "^(?!(tests|migrations)).*[pydocstyle]"
 
 [tool.ruff]
 line-length=100
+src = ["src", "tests"]
+target-version = "py311"
+select = [
+  "E",    # pycodestyle errors
+  "W",    # pycodestyle warning
+  "A",    # flake8-builtins
+  "B",    # flake8-bugbear
+  "C4",   # flake8-comprehension
+  "C90",  # mccabe
+  "D",    # pydocstyle
+  "F",    # pyflakes
+  "UP",   # pyupgrade
+  "I",    # isort
+  "N",  # pep8-naming
+  "S",  # flake8-bandit
+  "EM",  # flake8-errmsg
+  "EXE",  # flake8-executable
+  "FA",   # flake8-future-annotations
+  "DTZ",  # flake8-datetimez
+  "ICN",  # flake8-import-conventions
+  "YTT",  # flake8-2020
+  #"ANN",  # flake8-annotations
+  "COM",  # flake8-commas
+  #"ASYNC",   # flake8-async
+]
+ignore = [
+  "D100",   # Missing docstring in public module
+  "D104",   # Missing docstring in public package
+  "N805",   # First argument of a method should be named `self` (we're using ZCA)
+  "EM101",  # Exception must not use a string literal, assign to variable first
+  "EM102",  # Exception must not use an f-string literal, assign to variable first
+]
+
+[tool.ruff.pydocstyle]
+convention = "google"

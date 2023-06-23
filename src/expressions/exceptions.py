@@ -14,7 +14,7 @@ class ExpressionError(Exception):
 class ExpressionValidationError(ExpressionError):
     """Expression Validation Error.
 
-    Exception raised during expression creation.
+    Error raised during expression creation.
     """
 
     def __init__(self, message: str, errors: list[dict]) -> None:
@@ -31,29 +31,29 @@ class ExpressionValidationError(ExpressionError):
 class ExpressionEvaluationError(ExpressionError):
     """Expression Evaluation Error.
 
-    Exception raised when there's an error evaluating the expression.
+    Error raised when there's an error evaluating the expression.
     """
 
 
-class VariableNotFoundException(ExpressionEvaluationError):
+class VariableNotFoundError(ExpressionEvaluationError):
     """Variable not found during evaluation."""
 
 
-class VariableTypeException(ExpressionEvaluationError):
+class VariableTypeError(ExpressionEvaluationError):
     """Variable has wrong type."""
 
 
-class ContextException(ExpressionError):
+class ContextError(ExpressionError):
     """Base exception class for context related errors."""
 
 
-class ContextVariableNotFoundException(ContextException):
-    """Exception raised when trying to access a variable not in context."""
+class ContextVariableNotFoundError(ContextError):
+    """Error raised when trying to access a variable not in context."""
 
 
-class ContextPopException(ContextException):
+class ContextPopError(ContextError):
     """Attempt to pop mapping from context with no mappings."""
 
 
-class ParseException(ExpressionError):
-    """Parse Exception."""
+class ParseError(ExpressionError):
+    """Parse Error."""

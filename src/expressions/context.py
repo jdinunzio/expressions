@@ -1,7 +1,7 @@
 from collections import deque
 from typing import Any
 
-from expressions.exceptions import ContextPopException, ContextVariableNotFoundException
+from expressions.exceptions import ContextPopError, ContextVariableNotFoundError
 
 # Marker to indicate no default has been specified (we can't use None, since that's a possible
 # valid default).
@@ -44,9 +44,9 @@ class Context:
         if default != NoDefault:
             return default
 
-        raise ContextVariableNotFoundException(name)
+        raise ContextVariableNotFoundError(name)
 
-    def set(self, name: str, value: Any) -> None:
+    def set(self, name: str, value: Any) -> None:  # noqa:
         """Set value of variable in the topmost mapping in the context.
 
         Args:
@@ -75,4 +75,4 @@ class Context:
         try:
             return self._mappings.popleft()
         except IndexError as exc:
-            raise ContextPopException("No context to pop") from exc
+            raise ContextPopError("No context to pop") from exc

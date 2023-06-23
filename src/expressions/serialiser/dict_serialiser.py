@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
 from decimal import Decimal
-from typing import cast
+from typing import Any, cast
 
 import zope.interface  # type: ignore
 from zope.component import getUtility  # type: ignore
 
 from expressions import Expression
-from expressions.exceptions import ParseException
+from expressions.exceptions import ParseError
 from expressions.expr.expr_base import HomogeneousListMixin, MappeableMixin
 from expressions.expr.literals import LiteralMixin
 
@@ -65,7 +65,7 @@ def deserialiser_from_instance(data: PrimitiveType) -> IPrimitiveDeserialiser:
         # dict deserialiser is chosen by the name of its (only) key
         keys = list(data.keys())
         if len(keys) != 1:
-            raise ParseException("expression {data} has more than one key")
+            raise ParseError("expression {data} has more than one key")
         deserialiser_name = keys.pop()
     else:
         # other deserialisers are chosen by their class name
@@ -145,7 +145,8 @@ class HomogeneousListDictDeserialiser:
     def deserialise(self, data: PrimitiveType) -> Expression:
         """Deserialise expression with homogeneous lists."""
         # get the list from the first and only key in the data
-        assert isinstance(data, dict)
+        self.assert_is_dict(data)
+        data = cast(dict, data)
         data_key = list(data.keys()).pop()
         data_list = data[data_key]
         sub_expressions = []
@@ -154,6 +155,12 @@ class HomogeneousListDictDeserialiser:
             sub_expression = deserialiser.deserialise(sub_data)  # type: ignore
             sub_expressions.append(sub_expression)
         return cast(Expression, self.expr_class(*sub_expressions))
+
+    @staticmethod
+    def assert_is_dict(data: Any) -> None:
+        """Raise if the given object is not a dictionary."""
+        if not isinstance(data, dict):
+            raise ParseError(f"serialiser expected dict, got {type(data)}")
 
 
 @zope.interface.implementer(IPrimitiveSerialiser)
@@ -198,7 +205,8 @@ class MappeableDeserialiser:
     def deserialise(self, data: PrimitiveType) -> Expression:
         """Deserialise mapped expression."""
         # get the list from the first and only key in the data
-        assert isinstance(data, dict)
+        self.assert_is_dict(data)
+        data = cast(dict, data)
         data_key = list(data.keys()).pop()
         data_dict = data[data_key]
         # deserialise values is dict that correspond with sub-expressions
@@ -208,3 +216,9 @@ class MappeableDeserialiser:
             sub_expression = deserialiser.deserialise(sub_data)  # type: ignore
             data_dict[key] = sub_expression
         return cast(Expression, self.expr_class(**data_dict))
+
+    @staticmethod
+    def assert_is_dict(data: Any) -> None:
+        """Raise if the given object is not a dictionary."""
+        if not isinstance(data, dict):
+            raise ParseError(f"deserialiser expected dict, got {type(data)}")

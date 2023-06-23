@@ -21,7 +21,7 @@ class Add(Arithmetic):
 
     def evaluate(self, context: Context) -> Decimal:
         """Evaluate addition in context."""
-        return sum((expr.evaluate(context) for expr in self.sub_expressions()))  # type: ignore
+        return sum(expr.evaluate(context) for expr in self.sub_expressions())  # type: ignore
 
 
 class Sub(Arithmetic):
@@ -43,7 +43,6 @@ class Mul(Arithmetic):
 
     def evaluate(self, context: Context) -> Decimal:
         """Evaluate multiplication in context."""
-
         return reduce(mul, (expr.evaluate(context) for expr in self._sub_expressions), Decimal(1))
 
 

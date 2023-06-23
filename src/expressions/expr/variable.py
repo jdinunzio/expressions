@@ -2,9 +2,9 @@ from typing import Any, TypeVar, cast
 
 from expressions.context import Context, NoDefault
 from expressions.exceptions import (
-    ContextVariableNotFoundException,
-    VariableNotFoundException,
-    VariableTypeException,
+    ContextVariableNotFoundError,
+    VariableNotFoundError,
+    VariableTypeError,
 )
 from expressions.expr.expr_base import Expression, ExpressionArity, MappeableMixin
 
@@ -26,24 +26,27 @@ class Variable(Expression[T], MappeableMixin):
     sub_expression_names: tuple[str] = ()  # type: ignore
 
     def __init__(self, name: str, return_type: type, default: Any = NoDefault):
+        """Variable expression constructor."""
         self.name = name
         self.return_type = return_type
         self.default = default
 
     def evaluate(self, context: Context) -> T:
+        """Evalaute this expressionn in the given context, returning a value."""
         try:
             value = context.get(self.name, self.default)
-        except ContextVariableNotFoundException as exc:
-            raise VariableNotFoundException(f"variable {self.name!s} not found") from exc
+        except ContextVariableNotFoundError as exc:
+            raise VariableNotFoundError(f"variable {self.name!s} not found") from exc
 
         if not isinstance(value, self.return_type):
-            raise VariableTypeException(
+            raise VariableTypeError(
                 f"Variable '{self.name}' has incorrect type, "
-                f"expected: {self.return_type}, gotten: {type(value)}"
+                f"expected: {self.return_type}, gotten: {type(value)}",
             )
         return value  # type: ignore
 
     def sub_expressions(self) -> tuple[Expression, ...]:
+        """Return sub-expressions of this expression."""
         return ()
 
     def to_dict(self) -> dict[str, Any]:

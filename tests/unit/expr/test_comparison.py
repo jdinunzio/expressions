@@ -4,6 +4,8 @@ from itertools import product
 from operator import eq, ge, gt, le, lt, ne
 from unittest import TestCase
 
+import pytz
+
 from expressions import (
     Boolean,
     Datetime,
@@ -29,7 +31,7 @@ class TestComparison(TestCase):
         Boolean: (False, True),
         Number: (-3.5, 7),
         String: ("bar", "foo"),
-        Datetime: (datetime(2020, 10, 12), datetime(2021, 1, 2)),
+        Datetime: (datetime(2020, 10, 12, tzinfo=pytz.utc), datetime(2021, 1, 2, tzinfo=pytz.utc)),
         Timedelta: (timedelta(minutes=3), timedelta(hours=2)),
     }
     compare_expressions = (

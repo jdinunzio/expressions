@@ -116,6 +116,7 @@ class JSONExpressionEncoder(json.JSONEncoder):
 
     @staticmethod
     def encode_type(klass: type) -> dict:
+        """Encode class, converting it into a dictionary."""
         klass_name = klass.__name__
         klass_args: tuple[type] | None = getattr(klass, "__args__", None)
         encoded = {"__class__": "type", "__value__": klass_name}
@@ -183,10 +184,10 @@ def dict_to_type(obj: dict) -> type:  # type: ignore  # pylint: disable=R0911
         case "dict", None:
             return dict
         case "tuple", args:
-            return tuple[tuple((dict_to_type(o) for o in args))]  # type: ignore
+            return tuple[tuple(dict_to_type(o) for o in args)]  # type: ignore
         case "list", args:
-            return list[tuple((dict_to_type(o) for o in args))]  # type: ignore
+            return list[tuple(dict_to_type(o) for o in args)]  # type: ignore
         case "dict", args:
-            return dict[tuple((dict_to_type(o) for o in args))]  # type: ignore
+            return dict[tuple(dict_to_type(o) for o in args)]  # type: ignore
         case _, _:
             raise RuntimeError("undecodable dictionary")
