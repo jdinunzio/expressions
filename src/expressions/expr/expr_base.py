@@ -53,7 +53,7 @@ class Expression(abc.ABC, Generic[T]):
     is_literal: bool = False
     arity: ExpressionArity
 
-    @property
+    @property  # type: ignore
     @classmethod
     def is_terminal(cls) -> bool:
         """Return true if this expression is terminal.

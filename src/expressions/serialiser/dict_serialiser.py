@@ -23,7 +23,9 @@ class IPrimitiveSerialiser(zope.interface.Interface):  # pylint: disable=inherit
 class IPrimitiveDeserialiser(zope.interface.Interface):  # pylint: disable=inherit-non-class
     """Interfcace fod Deserialiser from Python Primitive types to Expressions."""
 
-    def deserialise(data: PrimitiveType) -> Expression:  # pylint: disable=no-self-argument
+    def deserialise(  # type: ignore # pylint: disable=no-self-argument
+        data: PrimitiveType,
+    ) -> Expression:
         """Deserialise expression from primitive python types."""
 
 
