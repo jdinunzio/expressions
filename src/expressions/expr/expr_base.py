@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import abc
+from collections.abc import Sequence
 from enum import IntEnum
-from typing import Any, Generic, Sequence, TypeVar, cast
+from typing import Any, Generic, TypeVar, cast
 
 from expressions.context import Context
 from expressions.exceptions import ExpressionValidationError
@@ -133,7 +134,10 @@ class HomogeneousListMixin(Generic[T]):
             return False
 
         # their sub-expressions must be equal (and in the same order)
-        return all((self_sub == other_sub for (self_sub, other_sub) in zip(self_subs, other_subs)))
+        return all(
+            self_sub == other_sub
+            for (self_sub, other_sub) in zip(self_subs, other_subs, strict=True)
+        )
 
     def __repr__(self) -> str:
         """Return string representation of this instance."""

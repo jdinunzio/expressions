@@ -3,6 +3,8 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from unittest import TestCase
 
+import pytz
+
 from expressions import (
     Add,
     And,
@@ -93,7 +95,10 @@ class TestPrimitivePaser(TestPaserMixin, TestCase):
         (Boolean(False), False),
         (Number("1.3"), Decimal("1.3")),
         (String("Hello"), "Hello"),
-        (Datetime(datetime(2020, 11, 30)), datetime(2020, 11, 30)),
+        (
+            Datetime(datetime(2020, 11, 30, tzinfo=pytz.utc)),
+            datetime(2020, 11, 30, tzinfo=pytz.utc),
+        ),
         (Timedelta(timedelta(hours=3)), timedelta(hours=3)),
         # logical
         (Not(Boolean(True)), {"not": [True]}),
@@ -104,8 +109,16 @@ class TestPrimitivePaser(TestPaserMixin, TestCase):
         (NotEqual(String("hi"), String("hello")), {"not-equal": ["hi", "hello"]}),
         (GreaterThan(Number(3), Number(2)), {"greater-than": [Decimal(3), Decimal(2)]}),
         (
-            GreaterThanOrEqual(Datetime(datetime(2020, 1, 2)), Datetime(datetime(2021, 2, 3))),
-            {"greater-than-or-equal": [datetime(2020, 1, 2), datetime(2021, 2, 3)]},
+            GreaterThanOrEqual(
+                Datetime(datetime(2020, 1, 2, tzinfo=pytz.utc)),
+                Datetime(datetime(2021, 2, 3, tzinfo=pytz.utc)),
+            ),
+            {
+                "greater-than-or-equal": [
+                    datetime(2020, 1, 2, tzinfo=pytz.utc),
+                    datetime(2021, 2, 3, tzinfo=pytz.utc),
+                ],
+            },
         ),
         (
             LessThan(Timedelta(timedelta(hours=2)), Timedelta(timedelta(minutes=3))),
@@ -131,7 +144,7 @@ def obj_to_json(val: datetime | timedelta | Decimal | float | int | type) -> str
         return f'{{"__class__": "datetime", "__value__": "{val.isoformat()}"}}'
     if isinstance(val, timedelta):
         return f'{{"__class__": "timedelta", "__value__": {val.total_seconds()}}}'
-    if isinstance(val, (Decimal, float, int)):
+    if isinstance(val, Decimal | float | int):
         return f'{{"__class__": "bignum", "__value__": "{val}"}}'
     if isinstance(val, type):
         return f'{{"__class__": "type", "__value__": "{val.__name__}"}}'
@@ -154,7 +167,10 @@ class TestJsonPaser(TestPaserMixin, TestCase):
             obj_to_json(Decimal("123456789012345678901234567890.123")),
         ),
         (String("Hello"), '"Hello"'),
-        (Datetime(datetime(2020, 11, 30)), obj_to_json(datetime(2020, 11, 30))),
+        (
+            Datetime(datetime(2020, 11, 30, tzinfo=pytz.utc)),
+            obj_to_json(datetime(2020, 11, 30, tzinfo=pytz.utc)),
+        ),
         (Timedelta(timedelta(hours=3)), obj_to_json(timedelta(hours=3))),
         # logical
         (Not(Boolean(True)), '{"not": [true]}'),
@@ -165,9 +181,12 @@ class TestJsonPaser(TestPaserMixin, TestCase):
         (NotEqual(String("hi"), String("hello")), '{"not-equal": ["hi", "hello"]}'),
         (GreaterThan(Number(3), Number(2)), '{"greater-than": [3, 2]}'),
         (
-            GreaterThanOrEqual(Datetime(datetime(2020, 1, 2)), Datetime(datetime(2021, 2, 3))),
-            f'{{"greater-than-or-equal": [{obj_to_json(datetime(2020, 1, 2))}, '
-            f"{obj_to_json(datetime(2021, 2, 3))}]}}",
+            GreaterThanOrEqual(
+                Datetime(datetime(2020, 1, 2, tzinfo=pytz.utc)),
+                Datetime(datetime(2021, 2, 3, tzinfo=pytz.utc)),
+            ),
+            f'{{"greater-than-or-equal": [{obj_to_json(datetime(2020, 1, 2, tzinfo=pytz.utc))}, '
+            f"{obj_to_json(datetime(2021, 2, 3, tzinfo=pytz.utc))}]}}",
         ),
         (
             LessThan(Timedelta(timedelta(hours=2)), Timedelta(timedelta(minutes=3))),
